@@ -1,4 +1,10 @@
-from valhalla import valhalla
+import valhalla
+import numpy as np
 
 def test_val():
-    assert valhalla.add(4,5) == 9
+    it = valhalla.Interval()
+    assert it.empty
+
+
+
+
