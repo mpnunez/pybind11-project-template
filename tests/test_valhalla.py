@@ -2,7 +2,7 @@ from valhalla import Interval, IntervalSet
 import numpy as np
 
 
-def test_val2():
+def test_normalization():
     iset = IntervalSet()
     iset.intervals = [
         Interval(0,10),
@@ -18,3 +18,48 @@ def test_val2():
     ]
 
     assert iset == iset2
+
+def test_union():
+    iset = IntervalSet()
+    iset.intervals = [
+        Interval(1,4),
+        Interval(8,12),
+        Interval(15,20),
+    ]
+
+    iset2 = IntervalSet()
+    iset2.intervals = [
+        Interval(3,9),
+        Interval(11,12),
+    ]
+
+    expected = IntervalSet()
+    expected.intervals = [
+        Interval(1,13),
+        Interval(15,20),
+    ]
+
+    assert iset or iset2 == expected
+
+def test_intersection():
+    iset = IntervalSet()
+    iset.intervals = [
+        Interval(1,4),
+        Interval(8,12),
+        Interval(15,20),
+    ]
+
+    iset2 = IntervalSet()
+    iset2.intervals = [
+        Interval(3,9),
+        Interval(11,12),
+    ]
+
+    expected = IntervalSet()
+    expected.intervals = [
+        Interval(3,4),
+        Interval(8,9),
+        Interval(11,12),
+    ]
+
+    assert iset and iset2 == expected

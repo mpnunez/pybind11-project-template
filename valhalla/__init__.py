@@ -3,6 +3,9 @@ import numpy as np
 from itertools import chain
 
 class Interval:
+    """
+    start < end
+    """
     def __init__(self,start=None,end=None):
         self.start = start if start else 0
         self.end = end if end else 0
@@ -14,8 +17,10 @@ class Interval:
     def __lt__(self,other):
         return self.start < other.start
 
-    def overlaps(self,other) -> bool:
-        return (self.start <= other.end) and (self.end >= other.start)
+    def overlaps(self,other,include_ends=True) -> bool:
+        if include_ends:
+            return (self.start <= other.end) and (self.end >= other.start)
+        return (self.start < other.end) and (self.end > other.start)
 
     def merge(self,other):
         """
@@ -25,10 +30,17 @@ class Interval:
         return Interval(min(self.start,other.start),
             max(self.end,other.end))
 
+    def intersect(self,other):
+        return Interval(max(self.start,other.start),
+            min(self.end,other.end))
+
     def __eq__(self,other):
         return (self.start == other.start) and (self.end == other.end)
 
 class IntervalSet:
+    """
+    Collection of disjoint invervals
+    """
     def __init__(self):
         self.intervals = []
 
@@ -57,8 +69,6 @@ class IntervalSet:
             disjoint_intervals.append(current_interval)
 
         self.intervals = disjoint_intervals
-
-
 
     def __and__(self,other):
         return IntervalSet()
