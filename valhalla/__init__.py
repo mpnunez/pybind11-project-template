@@ -1,18 +1,64 @@
 from typing import List
 import numpy as np
+from itertools import chain
 
 class Interval:
-    def __init__(self):
-        self.min = 1
-        self.max = -1
+    def __init__(self,start=None,end=None):
+        self.start = start if start else 0
+        self.end = end if end else 0
 
     @property
-    def empty(self):
-        return self.min > self.max
+    def length(self):
+        return min(0,self.end-self.start)
+
+    def __lt__(self,other):
+        return self.start < other.start
+
+    def overlaps(self,other) -> bool:
+        return (self.start <= other.end) and (self.end >= other.start)
+
+    def merge(self,other):
+        """
+        Merge intervals assuming they overlap
+        """
+
+        return Interval(min(self.start,other.start),
+            max(self.end,other.end))
+
+    def __eq__(self,other):
+        return (self.start == other.start) and (self.end == other.end)
 
 class IntervalSet:
     def __init__(self):
         self.intervals = []
+
+    @property
+    def total_length(self):
+        return sum(i.length for i in self.intervals)
+
+    def sanitize(self):
+        """
+        Remove overlaps
+        """
+        disjoint_intervals = []
+        current_interval = None
+        for i in sorted(self.intervals):
+            if current_interval is None:
+                current_interval = i
+                continue
+            
+            if i.overlaps(current_interval):
+                current_interval = i.merge(current_interval)
+            else:
+                disjoint_intervals.append(current_interval)
+                current_interval = i
+
+        if current_interval is not None:
+            disjoint_intervals.append(current_interval)
+
+        self.intervals = disjoint_intervals
+
+
 
     def __and__(self,other):
         return IntervalSet()
@@ -21,7 +67,13 @@ class IntervalSet:
         return IntervalSet()
 
     def __or__(self,other):
-        return IntervalSet()
+        ret = IntervalSet()
+        ret.intervals = self.intervals + other.intervals
+        ret.sanitize()
+        return ret
 
     def __xor__(self,other):
         return IntervalSet()
+
+    def __eq__(self,other):
+        return self.intervals == other.intervals
