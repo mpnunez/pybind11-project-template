@@ -1,7 +1,6 @@
 #include <pybind11/pybind11.h>
 
-#define STRINGIFY(x) #x
-#define MACRO_STRINGIFY(x) STRINGIFY(x)
+#include "boolean.hpp"
 
 int add(int i, int j) {
     return i + j;
@@ -35,9 +34,6 @@ PYBIND11_MODULE(cmake_example, m) {
         Some other explanation about the subtract function.
     )pbdoc");
 
-#ifdef VERSION_INFO
-    m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);
-#else
-    m.attr("__version__") = "dev";
-#endif
+    m.attr("__version__") = "1.0.0";
+
 }

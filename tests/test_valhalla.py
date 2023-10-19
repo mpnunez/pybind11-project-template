@@ -62,4 +62,4 @@ def test_intersection():
         Interval(11,12),
     ]
 
-    assert iset and iset2 == expected
+    assert iset & iset2 == expected

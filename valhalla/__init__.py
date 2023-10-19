@@ -37,6 +37,9 @@ class Interval:
     def __eq__(self,other):
         return (self.start == other.start) and (self.end == other.end)
 
+    def __str__(self):
+        return "[{},{}]".format(self.start,self.end)
+
 class IntervalSet:
     """
     Collection of disjoint invervals
@@ -71,7 +74,20 @@ class IntervalSet:
         self.intervals = disjoint_intervals
 
     def __and__(self,other):
-        return IntervalSet()
+        ret = IntervalSet()
+        i = 0
+        j = 0
+        current_interval = None
+        while (i<len(self.intervals)) and (j<len(other.intervals)):
+            if self.intervals[i].overlaps(other.intervals[j],include_ends=False):
+                ret.intervals.append(self.intervals[i].intersect(other.intervals[j]))
+            
+            if self.intervals[i] < other.intervals[j]:
+                i += 1
+            else:
+                j += 1
+        
+        return ret
 
     def __sub__(self,other):
         return IntervalSet()
@@ -87,3 +103,7 @@ class IntervalSet:
 
     def __eq__(self,other):
         return self.intervals == other.intervals
+
+    def print(self):
+        for i in self.intervals:
+            print(i)
