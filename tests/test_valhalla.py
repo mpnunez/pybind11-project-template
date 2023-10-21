@@ -63,3 +63,50 @@ def test_intersection():
     ]
 
     assert iset & iset2 == expected
+
+def test_not():
+    iset = IntervalSet()
+    iset.intervals = [
+        Interval(1,4),
+        Interval(8,12),
+        Interval(15,20),
+    ]
+
+    iset2 = IntervalSet()
+    iset2.intervals = [
+        Interval(3,9),
+        Interval(11,12),
+    ]
+
+    expected = IntervalSet()
+    expected.intervals = [
+        Interval(1,3),
+        Interval(9,11),
+        Interval(15,20),
+    ]
+
+    assert (iset - iset2) == expected
+
+def test_xor():
+    iset = IntervalSet()
+    iset.intervals = [
+        Interval(1,4),
+        Interval(8,12),
+        Interval(15,20),
+    ]
+
+    iset2 = IntervalSet()
+    iset2.intervals = [
+        Interval(3,9),
+        Interval(11,12),
+    ]
+
+    expected = IntervalSet()
+    expected.intervals = [
+        Interval(1,3),
+        Interval(4,8),
+        Interval(9,11),
+        Interval(15,20),
+    ]
+
+    assert (iset ^ iset2) == expected
