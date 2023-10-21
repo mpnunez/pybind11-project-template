@@ -77,7 +77,6 @@ class IntervalSet:
         ret = IntervalSet()
         i = 0
         j = 0
-        current_interval = None
         while (i<len(self.intervals)) and (j<len(other.intervals)):
             if self.intervals[i].overlaps(other.intervals[j],include_ends=False):
                 ret.intervals.append(self.intervals[i].intersect(other.intervals[j]))
@@ -94,8 +93,45 @@ class IntervalSet:
 
     def __or__(self,other):
         ret = IntervalSet()
-        ret.intervals = self.intervals + other.intervals
-        ret.sanitize()
+        i = 0
+        j = 0
+        current_interval = None
+        while (i < len(self.intervals)) or (j < len(other.intervals)):
+            # Pick the next interval to be the min from the two interval sets
+            # incrememnt counter for the one that was picked
+            if i == len(self.intervals):
+                next_interval = other.intervals[j]
+                j += 1
+            elif j == len(self.intervals):
+                next_interval = self.intervals[i]
+                i += 1
+            else:
+                if self.intervals[i] < other.intervals[j]:
+                    next_interval = self.intervals[i]
+                    i += 1
+                else:
+                    next_interval = other.intervals[j]
+                    j += 1
+
+            # Handle first interval
+            if current_interval is None:
+                current_interval = next_interval
+                continue
+
+            # Test if current_interval overlaps next_interval
+            # then merge them and continue
+            if current_interval.overlaps(next_interval):
+                current_interval = current_interval.merge(next_interval)
+
+            # If no overlap, add current_interval to
+            # the running list and set current_interval to next_interval
+            else:
+                ret.intervals.append(current_interval)
+                current_interval = next_interval
+
+        if current_interval is not None:
+            ret.intervals.append(current_interval)
+
         return ret
 
     def __xor__(self,other):
