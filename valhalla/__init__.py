@@ -89,7 +89,38 @@ class IntervalSet:
         return ret
 
     def __sub__(self,other):
-        return IntervalSet()
+        ret =  IntervalSet()
+
+        j = 0
+        for itvl in self.intervals:
+
+            # AND with -> add to ret.intervals
+            # Keep doing this until you run out of other.intervals
+            # or they're > and don't overlap current interval
+
+            left = itvl.start
+            right = itvl.end
+            while( (left < right) and (j<len(other.intervals)) and not (other.intervals[j].start>=itvl.end) ):
+                # If no overlap, other is too far back. Incrememt it
+                if other.intervals[j].end <= left:
+                    j += 1
+                    continue
+
+                # There is definitely overlap here
+                if left < other.intervals[j].start:
+                    ret.intervals.append(Interval(left,other.intervals[j].start))
+                    left = other.intervals[j].end
+                else:
+                    left = other.intervals[j].end
+                    j += 1
+                
+                
+
+            if left < right:
+                ret.intervals.append(Interval(left,right))
+
+        return ret
+                
 
     def __or__(self,other):
         ret = IntervalSet()
@@ -102,7 +133,7 @@ class IntervalSet:
             if i == len(self.intervals):
                 next_interval = other.intervals[j]
                 j += 1
-            elif j == len(self.intervals):
+            elif j == len(other.intervals):
                 next_interval = self.intervals[i]
                 i += 1
             else:
@@ -135,7 +166,7 @@ class IntervalSet:
         return ret
 
     def __xor__(self,other):
-        return IntervalSet()
+        return (self - other) | (other - self)
 
     def __eq__(self,other):
         return self.intervals == other.intervals

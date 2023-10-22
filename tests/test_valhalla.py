@@ -1,59 +1,48 @@
 from valhalla import Interval, IntervalSet
 import numpy as np
 
+iset = IntervalSet()
+iset.intervals = [
+    Interval(1,4),
+    Interval(8,12),
+    Interval(15,20),
+]
+
+iset2 = IntervalSet()
+iset2.intervals = [
+    Interval(3,9),
+    Interval(11,12),
+]
 
 def test_normalization():
-    iset = IntervalSet()
-    iset.intervals = [
+    iset3 = IntervalSet()
+    iset3.intervals = [
         Interval(0,10),
         Interval(5,15),
         Interval(10,20),
         Interval(15,25),
     ]
-    iset.sanitize()
+    iset3.sanitize()
 
-    iset2 = IntervalSet()
-    iset2.intervals = [
+    iset4 = IntervalSet()
+    iset4.intervals = [
         Interval(0,25),
     ]
 
-    assert iset == iset2
+    assert iset3 == iset4
 
 def test_union():
-    iset = IntervalSet()
-    iset.intervals = [
-        Interval(1,4),
-        Interval(8,12),
-        Interval(15,20),
-    ]
-
-    iset2 = IntervalSet()
-    iset2.intervals = [
-        Interval(3,9),
-        Interval(11,12),
-    ]
-
+    
     expected = IntervalSet()
     expected.intervals = [
-        Interval(1,13),
+        Interval(1,12),
         Interval(15,20),
     ]
 
-    assert iset or iset2 == expected
+    ans = iset | iset2
+    assert (iset | iset2) == expected
 
 def test_intersection():
-    iset = IntervalSet()
-    iset.intervals = [
-        Interval(1,4),
-        Interval(8,12),
-        Interval(15,20),
-    ]
-
-    iset2 = IntervalSet()
-    iset2.intervals = [
-        Interval(3,9),
-        Interval(11,12),
-    ]
 
     expected = IntervalSet()
     expected.intervals = [
@@ -65,18 +54,7 @@ def test_intersection():
     assert iset & iset2 == expected
 
 def test_not():
-    iset = IntervalSet()
-    iset.intervals = [
-        Interval(1,4),
-        Interval(8,12),
-        Interval(15,20),
-    ]
-
-    iset2 = IntervalSet()
-    iset2.intervals = [
-        Interval(3,9),
-        Interval(11,12),
-    ]
+    
 
     expected = IntervalSet()
     expected.intervals = [
@@ -85,21 +63,21 @@ def test_not():
         Interval(15,20),
     ]
 
-    assert (iset - iset2) == expected
+    ans = iset - iset2
+    assert ans == expected
+
+def test_not2():
+    
+
+    expected = IntervalSet()
+    expected.intervals = [
+        Interval(4,8),
+    ]
+
+    ans = iset2 - iset
+    assert ans == expected
 
 def test_xor():
-    iset = IntervalSet()
-    iset.intervals = [
-        Interval(1,4),
-        Interval(8,12),
-        Interval(15,20),
-    ]
-
-    iset2 = IntervalSet()
-    iset2.intervals = [
-        Interval(3,9),
-        Interval(11,12),
-    ]
 
     expected = IntervalSet()
     expected.intervals = [
@@ -109,4 +87,5 @@ def test_xor():
         Interval(15,20),
     ]
 
-    assert (iset ^ iset2) == expected
+    ans = (iset ^ iset2)
+    assert ans == expected
