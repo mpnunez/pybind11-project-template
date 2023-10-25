@@ -1,6 +1,7 @@
-#include "interval.cpp"
+#include "interval.hpp"
+#include <algorithm>
 
-Interval::Interval(int s, int e): start(e), end(e) {}
+Interval::Interval(int s, int e): start(s), end(e) {}
 
 int Interval::get_length() const{
     return std::max(0,end-start);
@@ -16,7 +17,7 @@ bool Interval::overlaps(const Interval& other, bool include_ends) const{
     return (start < other.end) and (end > other.start);
 }
 
-Interval Interval::merge(const Invterval& other) const{
+Interval Interval::merge(const Interval& other) const{
     return Interval(
         std::min(start,other.start),
         std::max(end,other.end)
@@ -33,5 +34,9 @@ Interval Interval::intersect(const Interval& other) const{
 
 bool Interval::operator==(const Interval& other) const{
     return (start == other.start) and (end == other.end);
+}
+
+bool Interval::operator!=(const Interval& other) const{
+    return (start != other.start) or (end != other.end);
 }
 

@@ -1,10 +1,17 @@
 cmake_minimum_required(VERSION 3.4...3.18)
 project(cmake_example)
 
-add_subdirectory(pybind11)
-pybind11_add_module(cmake_example src/python_binder.cpp)
+# Specify target to build
+add_library(cboo STATIC
+    src/interval.cpp
+    src/intervalset.cpp
+    )
 
-# EXAMPLE_VERSION_INFO is defined by setup.py and passed into the C++ code as a
-# define (VERSION_INFO) here.
-target_compile_definitions(cmake_example
-                           PRIVATE VERSION_INFO=${EXAMPLE_VERSION_INFO})
+target_compile_features(cboo PRIVATE cxx_std_17)
+target_compile_options(cboo PRIVATE -Wall -Wpedantic -Weffc++ -Wextra -Wfatal-errors)
+set_property(TARGET cboo PROPERTY POSITION_INDEPENDENT_CODE ON)
+
+
+add_subdirectory(pybind11)
+# pybind11_add_module target name must match python module name
+pybind11_add_module(cmake_example src/python_binder.cpp)

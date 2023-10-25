@@ -1,4 +1,5 @@
-#include "intervalset.cpp"
+#include "intervalset.hpp"
+#include <numeric>
 #include <algorithm>
 
 int IntervalSet::get_total_length() const{
@@ -6,12 +7,14 @@ int IntervalSet::get_total_length() const{
         intervals.begin(),
         intervals.end(),
         0,
-        [](int total, Interval& itvl){return total + itvl.get_length();});
+        [](int total, const Interval& itvl){
+            return total + itvl.get_length();}
+            );
 }
 
 void IntervalSet::sanitize(){
 
-    std::vector<Interval> disjoint_intervals = []
+    std::vector<Interval> disjoint_intervals;
     Interval current_interval;
     bool current_interval_valid = false;
     std::sort(intervals.begin(),intervals.end());
@@ -23,7 +26,7 @@ void IntervalSet::sanitize(){
             continue;
         }
         
-        if itvl.overlaps(current_interval,true){
+        if(itvl.overlaps(current_interval,true)){
             current_interval = itvl.merge(current_interval);
         }
         else{
@@ -39,12 +42,12 @@ void IntervalSet::sanitize(){
     intervals = disjoint_intervals;
 }
 
-IntervalSet IntervalSet::operator&(const Inverval& other) const{
+IntervalSet IntervalSet::operator&(const IntervalSet& other) const{
 
     IntervalSet ret;
     size_t i = 0;
     size_t j = 0;
-    while (i<intervals.size()) and (j<other.intervals.size()){
+    while ((i<intervals.size()) and (j<other.intervals.size())){
 
         if(intervals[i].overlaps(other.intervals[j],false))
             ret.intervals.push_back(intervals[i].intersect(other.intervals[j]));
@@ -59,8 +62,9 @@ IntervalSet IntervalSet::operator&(const Inverval& other) const{
     }
     
     return ret;
+}
 
-IntervalSet IntervalSet::operator-(const InvervalSet& other) const {
+IntervalSet IntervalSet::operator-(const IntervalSet& other) const {
 
         IntervalSet ret;
 
@@ -103,10 +107,10 @@ IntervalSet IntervalSet::operator-(const InvervalSet& other) const {
 
         }
 
-        return ret
+        return ret;
 }         
 
-IntervalSet IntervalSet::operator|(const InveralSet& other) const{
+IntervalSet IntervalSet::operator|(const IntervalSet& other) const{
 
 
         IntervalSet ret;
@@ -115,11 +119,11 @@ IntervalSet IntervalSet::operator|(const InveralSet& other) const{
         bool current_interval_valid = false;
         Interval current_interval;
         Interval next_interval;
-        while (i < intervals.size()) or (j < other.intervals.size()):
-            # Pick the next interval to be the min from the two interval sets
-            # incrememnt counter for the one that was picked
+        while ((i < intervals.size()) or (j < other.intervals.size())){
+            // Pick the next interval to be the min from the two interval sets
+            // incrememnt counter for the one that was picked
             if (i == intervals.size()){
-                next_interval = other.intervals[j]
+                next_interval = other.intervals[j];
                 j++;
             }
             else if (j == other.intervals.size()){
@@ -132,7 +136,7 @@ IntervalSet IntervalSet::operator|(const InveralSet& other) const{
                     i++;
                 }
                 else{
-                    next_interval = other.intervals[j]
+                    next_interval = other.intervals[j];
                     j++;
                 }
             }
@@ -147,7 +151,7 @@ IntervalSet IntervalSet::operator|(const InveralSet& other) const{
 
             // Test if current_interval overlaps next_interval
             // then merge them and continue
-            if current_interval.overlaps(next_interval){
+            if(current_interval.overlaps(next_interval,true)){
                 current_interval = current_interval.merge(next_interval);
             }
             // If no overlap, add current_interval to
@@ -156,7 +160,7 @@ IntervalSet IntervalSet::operator|(const InveralSet& other) const{
                 ret.intervals.push_back(current_interval);
                 current_interval = next_interval;
             }
-                
+        }     
 
         if (current_interval_valid)
             ret.intervals.push_back(current_interval);
@@ -164,11 +168,11 @@ IntervalSet IntervalSet::operator|(const InveralSet& other) const{
         return ret;
 }
 
-IntervalSet IntervalSet::operator^(const InveralSet& other) const{
+IntervalSet IntervalSet::operator^(const IntervalSet& other) const{
     return (*this - other) | (other - *this);
 }
         
-IntervalSet IntervalSet::operator==(const InveralSet& other) const{
+bool IntervalSet::operator==(const IntervalSet& other) const{
     if(intervals.size() != other.intervals.size()) return false;
     for(int i = 0; i < intervals.size(); i++){
         if(intervals[i] != other.intervals[i]) return false;
