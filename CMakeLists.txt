@@ -20,7 +20,7 @@ add_subdirectory(googletest)
 
 enable_testing()
 # Specify target to build
-add_executable(cboopyb_unit_tests src/main_tests.cpp)
+add_executable(cboopyb_unit_tests  src/test_cboo.cpp src/main_tests.cpp)
 target_link_libraries(cboopyb_unit_tests PUBLIC cboo GTest::gtest_main)
 target_compile_features(cboopyb_unit_tests PRIVATE cxx_std_17)
 target_compile_options(cboopyb_unit_tests PRIVATE -Wall -Wpedantic -Weffc++ -Wextra -Wfatal-errors)

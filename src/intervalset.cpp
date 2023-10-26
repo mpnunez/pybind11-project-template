@@ -2,6 +2,12 @@
 #include <numeric>
 #include <algorithm>
 
+IntervalSet::IntervalSet(): intervals(){}
+
+void IntervalSet::insert(int s,int e){
+    intervals.emplace_back(s,e);
+}
+
 int IntervalSet::get_total_length() const{
     return std::accumulate(
         intervals.begin(),
