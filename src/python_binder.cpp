@@ -1,6 +1,7 @@
 #include <pybind11/pybind11.h>
 
-
+#include "interval.hpp"
+#include "intervalset.hpp"
 
 int add(int i, int j) {
     return i + j;
@@ -8,31 +9,50 @@ int add(int i, int j) {
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(cmake_example, m) {
+PYBIND11_MODULE(boopyb, m) {
     m.doc() = R"pbdoc(
         Pybind11 example plugin
         -----------------------
 
-        .. currentmodule:: cmake_example
+        .. currentmodule:: boopyb
 
         .. autosummary::
            :toctree: _generate
 
-           add
-           subtract
+           Interval
+           IntervalSet
     )pbdoc";
 
-    m.def("add", &add, R"pbdoc(
-        Add two numbers
+    py::class_<Interval>(m, "Geometry",
+                                 R"pbdoc(
+                    Stores an interval with integral endpoints.
+                    The interval always has a positive length.
 
-        Some other explanation about the add function.
-    )pbdoc");
+                    Attributes
+                    -----------
+                    start : int
+                        Start of the interval
+                    end : int
+                        End of the interval
+                    length : int
+                        end - start
 
-    m.def("subtract", [](int i, int j) { return i - j; }, R"pbdoc(
-        Subtract two numbers
-
-        Some other explanation about the subtract function.
-    )pbdoc");
+                )pbdoc")
+      .def_property_readonly("start",
+                             [](Interval &itvl) { return itvl.start; })
+      .def_property_readonly("end",
+                             [](Interval &itvl) { return itvl.end; })
+      .def_property_readonly("length",&Interval::get_length)
+      .def("__lt__",&Interval::operator<)
+      .def("overlaps",&Interval::overlaps)
+      .def("merge",&Interval::merge)
+      .def("intersect",&Interval::intersect)
+      .def("__eq__",&Interval::operator==)
+      .def(" __str__",[](Interval &itvl) {
+          return "["+std::to_string(itvl.start)
+          + ","+std::to_string(itvl.end)+"]";
+          })
+      ;
 
     m.attr("__version__") = "1.0.0";
 
