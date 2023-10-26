@@ -21,10 +21,10 @@ def main(mod):
         A ^ B
 
 if __name__ == "__main__":
-    # start_time = timeit.default_timer()
-    # main(pyboo)
-    # elapsed = timeit.default_timer() - start_time
-    # print(f"Pure-python elapsed time (s): {elapsed}")
+    start_time = timeit.default_timer()
+    main(pyboo)
+    elapsed = timeit.default_timer() - start_time
+    print(f"Pure-python elapsed time (s): {elapsed}")
 
     start_time = timeit.default_timer()
     main(boopyb)
