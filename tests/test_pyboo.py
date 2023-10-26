@@ -1,4 +1,4 @@
-from valhalla import Interval, IntervalSet
+from pyboo import Interval, IntervalSet
 import numpy as np
 
 iset = IntervalSet()

@@ -3,6 +3,8 @@
 #include "interval.hpp"
 #include "intervalset.hpp"
 
+#include <iostream>
+
 int add(int i, int j) {
     return i + j;
 }
@@ -23,7 +25,7 @@ PYBIND11_MODULE(boopyb, m) {
            IntervalSet
     )pbdoc";
 
-    py::class_<Interval>(m, "Geometry",
+    py::class_<Interval>(m, "Interval",
                                  R"pbdoc(
                     Stores an interval with integral endpoints.
                     The interval always has a positive length.
@@ -38,6 +40,12 @@ PYBIND11_MODULE(boopyb, m) {
                         end - start
 
                 )pbdoc")
+      .def(py::init([]() {
+          return Interval();
+           }))
+      .def(py::init([](int x, int y) {
+          return Interval(x,y);
+           }),py::arg("x"), py::arg("y"))
       .def_property_readonly("start",
                              [](Interval &itvl) { return itvl.start; })
       .def_property_readonly("end",
@@ -51,6 +59,40 @@ PYBIND11_MODULE(boopyb, m) {
       .def(" __str__",[](Interval &itvl) {
           return "["+std::to_string(itvl.start)
           + ","+std::to_string(itvl.end)+"]";
+          })
+      ;
+
+
+    py::class_<IntervalSet>(m, "IntervalSet",
+                                 R"pbdoc(
+                    Stores a list of ordered disjoint intervals.
+
+                    Attributes
+                    -----------
+                    intervals : list
+                        List of ordered disjoint intervals
+
+                )pbdoc")
+      .def(py::init([]() {
+          return IntervalSet();
+           }))
+
+      .def_property_readonly("total_length",&IntervalSet::get_total_length)
+      .def_property_readonly("intervals",[](const IntervalSet& itvls){return itvls.intervals;})
+      .def("insert",[](IntervalSet &itvls, const Interval &itvl) {
+          itvls.intervals.push_back(itvl);
+          })
+      .def("sanitize",&IntervalSet::sanitize)
+      .def("__and__",&IntervalSet::operator&)
+      .def("__sub__",&IntervalSet::operator-)
+      .def("__or__",&IntervalSet::operator|)
+      .def("__xor__",&IntervalSet::operator^)
+      .def("__eq__",&IntervalSet::operator==)
+      .def("print",[](const IntervalSet &itvls) {
+          for(auto const& itvl: itvls.intervals){
+              std::cout << "["+std::to_string(itvl.start)
+          + ","+std::to_string(itvl.end)+"]\n";
+          }
           })
       ;
 
