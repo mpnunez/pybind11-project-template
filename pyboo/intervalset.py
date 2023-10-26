@@ -7,8 +7,8 @@ class IntervalSet:
     def __init__(self):
         self.intervals = []
 
-    def insert(self,itvl):
-        self.intervals.append(itvl)
+    def insert(self,a,b):
+        self.intervals.append(Interval(a,b))
 
     @property
     def total_length(self):

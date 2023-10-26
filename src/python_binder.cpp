@@ -4,6 +4,7 @@
 #include "intervalset.hpp"
 
 #include <iostream>
+#include <memory>
 
 int add(int i, int j) {
     return i + j;
@@ -40,11 +41,9 @@ PYBIND11_MODULE(boopyb, m) {
                         end - start
 
                 )pbdoc")
-      .def(py::init([]() {
-          return Interval();
-           }))
+      .def(py::init<>())
       .def(py::init([](int x, int y) {
-          return Interval(x,y);
+          return std::make_unique<Interval>(x,y);
            }),py::arg("x"), py::arg("y"))
       .def_property_readonly("start",
                              [](Interval &itvl) { return itvl.start; })
@@ -73,14 +72,14 @@ PYBIND11_MODULE(boopyb, m) {
                         List of ordered disjoint intervals
 
                 )pbdoc")
-      .def(py::init([]() {
-          return IntervalSet();
-           }))
-
+      .def(py::init<>())
       .def_property_readonly("total_length",&IntervalSet::get_total_length)
       .def_property_readonly("intervals",[](const IntervalSet& itvls){return itvls.intervals;})
       .def("insert",[](IntervalSet &itvls, const Interval &itvl) {
           itvls.intervals.push_back(itvl);
+          })
+      .def("insert",[](IntervalSet &itvls, int s, int e) {
+          itvls.intervals.emplace_back(s,e);
           })
       .def("sanitize",&IntervalSet::sanitize)
       .def("__and__",&IntervalSet::operator&)
